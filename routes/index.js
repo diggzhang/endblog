@@ -145,6 +145,20 @@ module.exports = function(app) {
 		res.redirect('/');
 	});
 
+	app.get('/upload', checkLogin);
+	app.get('/upload', function (req, res) {
+		res.render('upload', {
+			title: '文件上传',
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+	app.post('/upload', function (req, res) {
+		req.flash('success', 'Success to upload file :D')
+		res.redirect('/upload');
+	})
+
 	function checkLogin(req, res, next) {
 		if (!req.session.user) {
 			req.flash('error', '未登录! function checkLogin(){}');
