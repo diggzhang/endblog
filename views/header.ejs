@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diggzh's Blog</title>
+    <link rel="stylesheet" href="/stylesheets/style.css"/>
+</head>
+<body>
+
+    <h1><%= title %></h1>
+    <hr/>
+
+    <nav>
+        <span><a title="HomePage" href="/">HomePage</a></span>
+        <% if (user) { console.log(user);%>
+        <span><a title="post" href="/post">Post</a></span>
+        <span><a title="logout" href="/logout">Logout</a></span>
+        <% } else { %>
+        <span><a title="Login" href="/login">Login</a></span>
+        <span><a title="Register" href="/reg">Register</a></span>
+        <% } %>
+    </nav>
+
+    <article>
+    <% if (success) { %>
+        <div><%= success %></div>
+    <% } %>
+    <% if (error) { %>
+        <div><%= error %></div>
+    <% } %>
+
