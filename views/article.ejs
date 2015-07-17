@@ -1,0 +1,16 @@
+<%- include header %>
+
+<p>
+    <% if (user && (user.name == post.name)) { %>
+    <span><a href="/edit/<%= post.name %>/<%= post.time.day %>/<%= post.title %>" class="edit">Edit :P</a></span>
+    <span><a href="/remove/<%= post.name %>/<%= post.name.day%>/<%= post.title %>" class="edit">Delete :X</a></span>
+    <% } %>
+</p>
+
+<p class="info">
+    Author: <a href="/u/<%= post.name %>"><%= post.name %></a> |
+    PublishDate: <%= post.time.minute %>
+</p>
+<p><%- post.post %></p>
+
+<%- include footer %>
