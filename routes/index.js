@@ -197,6 +197,40 @@ module.exports = function(app) {
 		});
 	});
 
+	app.get('/edit/:name/:day/:title', checkLogin);
+	app.get('/edit/:name/:day/:title', function (req, res) {
+		var currentUser = req.session.user;
+		Post.edit(currentUser.name, req.params.day, req.params.title, function (err, post) {
+			if (err) {
+				req.flash('error', err);
+				return res.redirect('back');
+			};
+
+			res.render('edit', {
+				title: '编辑',
+				post: post,
+				user: req.session.user,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.post('/edit/:name/:day/:title', checkLogin);
+	app.post('/edit/:name/:day/:title', function (req, res) {
+		var currentUser = req.session.user;
+		Post.update(currentUser.name, req.params.day, req.params.title, req.body.post, function (err) {
+			var url = encodeURI('/u/' + req.params.name + '/' + req.params.day + '/' + req.params.title);
+			if (err) {
+				req.flash('error', err);
+				return res.redirect(url);
+			};
+
+			req.flash('success', '修改成功');
+			res.redirect(url);
+		});
+	});
+
 	function checkLogin(req, res, next) {
 		if (!req.session.user) {
 			req.flash('error', '未登录! function checkLogin(){}');
