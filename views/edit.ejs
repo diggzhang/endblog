@@ -2,6 +2,11 @@
 
 <form method="post">
     Title: <input name="title" type="text" value="<%= post.title %>" disabled="disabled"/> <br/>
+    Tags:
+    <input type="text" name="tag1" value="<%= post.tags[0] %>" disabled="disabled" />
+    <input type="text" name="tag2" value="<%= post.tags[1] %>" disabled="disabled" />
+    <input type="text" name="tag3" value="<%= post.tags[2] %>" disabled="disabled" />
+    <br/>
     Content: <br/>
     <textarea name="post" id="" cols="100" rows="20"><%= post.post %></textarea> <br/>
 
