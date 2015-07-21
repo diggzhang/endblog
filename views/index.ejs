@@ -19,6 +19,8 @@
 </p>
 <p><%- post.post %></p>
 
+<p class="info">PV: <%= post.pv %> | CommentCount: <%= post.comments.length %></p>
+
 <% }) %>
 
 <%- include paging %>
