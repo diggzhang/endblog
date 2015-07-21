@@ -10,6 +10,12 @@
 <p class="info">
     Author: <a href="/u/<%= post.name %>"><%= post.name %></a> |
     PublishDate: <%= post.time.minute %>
+    Tag:
+    <% post.tags.forEach(function (tag, index) { %>
+    <% if (tag) { %>
+    <a href="/tags/<%= tag %>" class="tag"><%= tag %></a>
+    <% } %>
+    <% }); %>
 </p>
 <p><%- post.post %></p>
 
