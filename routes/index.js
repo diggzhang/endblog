@@ -181,6 +181,23 @@ module.exports = function(app) {
 		});
 	});
 
+	app.get('/tags', function (req. res) {
+		Post.getTags(function (err, posts) {
+			if (err) {
+				req.flash('error', err);
+				return res.redirect('/');
+			};
+
+			res.render('tags', {
+				title: 'Tags :|',
+				posts: posts,
+				user: req.session.user,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
 	app.get('/u/:name', function (req,  res) {
 
 		var page = req.query.p ? parseInt(req.query.p) : 1;
