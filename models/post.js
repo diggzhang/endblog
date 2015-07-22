@@ -31,6 +31,7 @@ Post.prototype.save = function(callback) {
 		tags: this.tags,
 		post: this.post,
 		comments: [],
+		reprint_info: {},
 		pv: 0
 	};
 
@@ -252,17 +253,55 @@ Post.remove = function (name, day, title, callback) {
 				return callback(err);
 			};
 
-			collection.remove({
+			collection.findOne({
 				"name": name,
 				"time.day": day,
 				"title": title
-			}, function (err) {
-				mongodb.close();
+			}, function (err, doc) {
 				if (err) {
+					mongodb.close();
 					return callback(err);
+				}
+
+				var reprint_from = "";
+				if (doc.reprint_info.reprint_from) {
+					reprint_from = doc.reprint_info.reprint_from;
 				};
 
-				callback(null);
+				if (reprint_from != "") {
+					collection.update({
+						"name": reprint_from.name,
+						"time.day": reprint_from.day,
+						"title": reprint_from.title
+					}, {
+						$pull: {
+							"reprint_info.reprint_to": {
+								"name": name,
+								"day": day,
+								"title": title
+							}
+						}
+					}, function (err) {
+						if (err) {
+							mongodb.close();
+							return callback(err);
+						}
+					});
+				};
+
+				collection.remove({
+					"name": name,
+					"time.day": day,
+					"title": title
+				}, {
+					w: 1
+				}, function (err) {
+					mongodb.close();
+					if(err) {
+						return callback(err);
+					}
+					callback(null);
+				});
 			});
 		});
 	});
@@ -383,6 +422,84 @@ Post.search = function (keyword, callback) {
 					return callback(err);
 				}
 				callback(null, docs);
+			});
+		});
+	});
+};
+
+Post.reprint = function (reprint_from, reprint_to, callback) {
+
+	mongodb.open(function (err, db) {
+		if (err) {
+			return callback(err);
+		};
+
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			};
+
+			collection.findOne({
+				"name": reprint_from.name,
+				"time.day": reprint_from.day,
+				"title": reprint_from.title
+			}, function (err, doc) {
+				if (err) {
+					mongodb.close();
+					return callback(err);
+				};
+
+				var date = new Date();
+				var time = {
+					date: date,
+					year: date.getFullYear(),
+					month: date.getFullYear() + '-' + (date.getMonth() + 1),
+					day: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+					minute: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getOne() + "" +
+						date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
+				}
+
+				delete doc._id;
+
+				doc.name = reprint_to.name;
+				doc.head = reprint_to.head;
+				doc.time = time;
+				doc.title = (doc.title.search(/[转载]/) > -1) ? doc.title : "[转载]" + doc.title;
+				doc.comments = [];
+				doc.reprint_info = {"reprint_from": reprint_from};
+				dov.pv = 0;
+
+
+				collection.update({
+					"name": reprint_from.name,
+					"time.day": reprint_from.day,
+					"title": reprint_from.title
+				}, {
+					$push: {
+						"reprint_info.reprint_to" : {
+							"name": doc.name,
+							"day": time.day,
+							"title": doc.title
+						}
+					}
+				}, function (err) {
+					if (err) {
+						mongodb.close();
+						return callback(err);
+					}
+				});
+
+				collection.insert(doc, {
+					safe: true
+				}, function (err, post) {
+					mongodb.close();
+					if (err) {
+						return callback(err);
+					}
+
+					callback(err, post[0]);
+				});
 			});
 		});
 	});
