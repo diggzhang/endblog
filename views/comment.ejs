@@ -1,11 +1,17 @@
 <br/>
 
 <% post.comments.forEach(function (comment, index) { %>
+<div style="padding-left: 4em;">
+    <p>
+        <img src="<%= comment.head %>" alt="" class="l_head"/>
+        <a href="<%= comment.website %>"> <%= comment.name %> </a>
+        <span class="info"> RepalyTime: <%= comment.time %></span>
+    </p>
+</div>
 <p>
-    <a href="<%= comment.website %>"> <%= comment.name %> </a>
-    <span class="info"> RepalyTime: <%= comment.time %></span>
 </p>
 <p><%- comment.content %></p>
+
 <% }); %>
 
 <form method="post">
